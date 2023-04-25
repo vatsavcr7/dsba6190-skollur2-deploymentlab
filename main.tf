@@ -151,3 +151,25 @@ resource "azurerm_firewall" "fire" {
     public_ip_address_id = azurerm_public_ip.pub.id
   }
 }
+resource "azurerm_app_service_plan" "web" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}web"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku {
+    tier = "Free"
+    size = "F1"
+  }
+}
+
+resource "azurerm_app_service" "wp" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}wp"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_app_service_plan.web.id
+}
+
+output "webapp_url" {
+  value = azurerm_app_service.wp.default_site_hostname
+
+
+}
